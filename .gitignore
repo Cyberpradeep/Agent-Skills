@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+*.pyo
+.pytest_cache/
+runs*.jsonl
+report_demo.md
+report_demo.html
+sample_report.html

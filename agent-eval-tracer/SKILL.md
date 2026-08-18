@@ -88,12 +88,14 @@ the logic is deterministic.
 ### 3. Isolate each agent — without touching real code
 
 Read `references/isolation.md`. The rule: **wrap, never invoke the live
-pipeline.** Replace every side-effecting tool with a stub/spy that records the
-intended action instead of performing it, freeze the agent's upstream inputs so
-you're testing *this* agent and not its dependencies, and run against copies of
-any shared state so nothing real is mutated. Adapt each real agent to the
-harness interface in `scripts/run_isolated.py`; that harness does the repeated
-running, timing, error capture, and trace recording for you.
+pipeline.** Replace every side-effecting tool with a stub/spy (supporting static
+returns or dynamic callback handlers) that records the intended action instead
+of performing it, freeze the agent's upstream inputs so you're testing *this*
+agent and not its dependencies, and run against copies of any shared state so
+nothing real is mutated. Adapt each real agent (synchronous, asynchronous, or
+streaming) to the harness interface in `scripts/run_isolated.py`; that harness
+handles repeated running, timing, timeout protection, rate-limit backoffs, error
+capture, and trace recording for you.
 
 ### 4. Run each input N times and check consistency (hallucination)
 
@@ -155,8 +157,9 @@ All scripts are framework-agnostic scaffolds — you adapt the user's real agent
 to a small interface, and the script handles the repetitive machinery. Read the
 top-of-file docstring of each before running.
 
-- `scripts/run_isolated.py` — runs one adapted agent in isolation, N times per
-  input, capturing reasoning + tool calls + output + timing to a runs file.
+- `scripts/run_isolated.py` — runs one adapted agent in isolation (supports sync,
+  async, and streaming), N times per input, with timeout and retry guardrails,
+  capturing reasoning + tool calls + output + timing to a runs file.
 - `scripts/consistency.py` — scores a set of runs for agreement / divergence and
   emits a stability verdict per input.
 - `scripts/planted_fact.py` — plant → filler → probe memory-recall scaffold, with

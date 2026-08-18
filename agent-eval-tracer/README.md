@@ -106,16 +106,22 @@ Agent Eval Tracer requires **Python 3.8+** with **zero third-party dependencies*
 Explore the harness and evaluation outputs without writing any code:
 
 ```bash
-# 1. Run the isolation harness demo
+# 1. Run the synchronous isolation harness demo
 python scripts/run_isolated.py --demo
 
-# 2. Run consistency and stability analysis
+# 2. Run the async & streaming agent demo
+python scripts/run_isolated.py --demo-async
+
+# 3. Run timeout & rate-limit retry resilience demo
+python scripts/run_isolated.py --demo-resilience
+
+# 4. Run consistency and stability analysis
 python scripts/consistency.py runs_demo.jsonl
 
-# 3. Run the planted-fact memory demo
+# 5. Run the planted-fact memory demo
 python scripts/planted_fact.py --demo
 
-# 4. Generate sample evaluation report (Markdown + HTML)
+# 6. Generate sample evaluation report (Markdown + HTML)
 python scripts/build_report.py --demo --html sample_report.html
 ```
 
@@ -125,34 +131,45 @@ python scripts/build_report.py --demo --html sample_report.html
 
 ### Step 1: Wrap Your Agent in an Adapter
 
-Create a lightweight adapter mapping your agent framework (LangChain, AutoGen, CrewAI, or custom loop) to the `AgentAdapter` interface:
+Create an adapter mapping your agent framework (LangChain, AutoGen, CrewAI, or async loop) to the `AgentAdapter` interface. The harness natively handles **synchronous functions, async coroutines, and streaming async generators**:
 
+#### Synchronous / Dynamic Spy Example:
 ```python
 from scripts.run_isolated import ToolSpy, run_suite
 
-def my_agent_adapter(test_input: dict, *, temperature: float = 0.0) -> dict:
-    # 1. Instantiate spies for side-effecting tools
-    db_spy = ToolSpy("db_write", returns={"status": "success"})
-    email_spy = ToolSpy("send_email", returns={"sent": True})
+def my_sync_adapter(test_input: dict, *, temperature: float = 0.0) -> dict:
+    # Dynamic spy handler for multi-step reasoning
+    def user_lookup(uid):
+        return {"tier": "vip" if uid > 500 else "standard"}
 
-    # 2. Instantiate your agent with spies injected
-    agent = build_agent(
-        tools=[db_spy, email_spy],
-        temperature=temperature
-    )
+    db_spy = ToolSpy("user_lookup", handler=user_lookup)
+    agent = build_agent(tools=[db_spy], temperature=temperature)
 
-    # 3. Execute isolated run
     result = agent.invoke(test_input)
-
     return {
         "output": result.output,          # Final decision or payload
         "reasoning": result.thought_log,   # Optional: CoT reasoning steps
-        "tool_calls": db_spy.calls + email_spy.calls, # Recorded spy calls
+        "tool_calls": db_spy.calls,       # Recorded spy calls
         "error": None
     }
 ```
 
-### Step 2: Execute the Isolation Suite
+#### Asynchronous / Streaming Example:
+```python
+async def my_async_adapter(test_input: dict, *, temperature: float = 0.0) -> dict:
+    spy = ToolSpy("db_write", returns={"status": "success"})
+    agent = build_async_agent(tools=[spy], temperature=temperature)
+
+    result = await agent.ainvoke(test_input)
+    return {
+        "output": result.output,
+        "reasoning": result.thought_log,
+        "tool_calls": spy.calls,
+        "error": None
+    }
+```
+
+### Step 2: Execute the Isolation Suite with Resilience Guardrails
 
 ```python
 test_fixtures = [
@@ -162,10 +179,13 @@ test_fixtures = [
 
 run_suite(
     agent_name="refund_classifier",
-    adapter=my_agent_adapter,
+    adapter=my_async_adapter,
     inputs=test_fixtures,
     repeats=5,
     regimes=[0.0, 0.7],
+    timeout_seconds=15.0,  # ⏳ Execution timeout per run
+    max_retries=3,         # 🔄 Automatic retry with backoff on 429 rate-limits
+    backoff_factor=1.5,
     out_path="runs/refund_classifier.jsonl"
 )
 ```

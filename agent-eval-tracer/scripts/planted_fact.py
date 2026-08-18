@@ -45,8 +45,15 @@ from __future__ import annotations
 
 import argparse
 import re
+import sys
 from dataclasses import dataclass, field
 from typing import Any, Callable, List, Optional, Protocol
+
+if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
 
 class Driver(Protocol):

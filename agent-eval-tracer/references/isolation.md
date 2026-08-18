@@ -30,21 +30,31 @@ do).
 
 ```python
 class ToolSpy:
-    """Records calls instead of performing them; returns a canned result."""
-    def __init__(self, name, returns=None):
+    """Records calls instead of performing them; returns a canned result or calls a dynamic handler."""
+    def __init__(self, name, returns=None, handler=None):
         self.name = name
         self.returns = returns
+        self.handler = handler     # optional dynamic callback for multi-step reasoning
         self.calls = []            # every (args, kwargs) the agent attempted
 
     def __call__(self, *args, **kwargs):
-        self.calls.append({"args": args, "kwargs": kwargs})
+        self.calls.append({"tool": self.name, "args": args, "kwargs": kwargs})
+        if self.handler is not None:
+            return self.handler(*args, **kwargs)
         return self.returns        # deterministic canned response
 ```
 
-Wire the agent's real tool registry to spies for the duration of the test. How
-you inject them depends on the framework — dependency injection if the agent
-takes its tools as an argument, monkeypatching if they're imported globals. Never
-let a real tool through.
+#### Dynamic / Stateful Spies for Multi-Step Tool Loops
+If your agent calls a tool in a loop where Step 2 depends on the output of Step 1 (e.g. `search()` followed by `fetch_details()`), pass a dynamic `handler`:
+
+```python
+def dynamic_db_handler(query_type, **kwargs):
+    if query_type == "check_status":
+        return {"active": True, "balance": 150}
+    return {"status": "ok"}
+
+db_spy = ToolSpy("db_query", handler=dynamic_db_handler)
+```
 
 ### 2. Upstream dependencies → frozen inputs
 
@@ -85,7 +95,7 @@ An adapter takes a single test input and returns a result dict with at least:
 }
 ```
 
-Minimal example adapter:
+### 1. Synchronous Adapter Example:
 
 ```python
 def make_adapter(real_agent_factory):
@@ -106,6 +116,54 @@ def make_adapter(real_agent_factory):
             "error":      None,
         }
     return adapter
+```
+
+### 2. Asynchronous & Streaming Adapter Example:
+
+The harness natively detects `async def` and async generators without requiring manual event-loop management:
+
+```python
+async def async_adapter(test_input, *, temperature=0.0):
+    spy = ToolSpy("fetch_profile", returns={"tier": "gold"})
+    agent = RealAsyncAgent(tools=[spy], temperature=temperature)
+    
+    # Execute async agent
+    result = await agent.ainvoke(test_input)
+    
+    return {
+        "output": result.output,
+        "reasoning": result.thought_log,
+        "tool_calls": spy.calls,
+        "error": None
+    }
+```
+
+For streaming agents (async generators yielding tokens or chunks), `run_isolated.py` automatically gathers the chunks into a unified string output:
+
+```python
+async def streaming_adapter(test_input, *, temperature=0.0):
+    async for chunk in agent.stream(test_input, temperature=temperature):
+        yield chunk.text
+```
+
+## Resilience: Timeouts & Rate-Limit Retries
+
+When running repeat evaluations ($N=5$ or $N=10$), agents can hang in reasoning loops or encounter API rate limits (HTTP 429). You can configure timeouts and backoff retries in `run_suite`:
+
+```python
+from scripts.run_isolated import run_suite
+
+run_suite(
+    agent_name="billing_agent",
+    adapter=async_adapter,
+    inputs=fixtures,
+    repeats=5,
+    regimes=[0.0, 0.7],
+    timeout_seconds=15.0,  # Execution timeout per run
+    max_retries=3,         # Exponential backoff retry on 429 / network errors
+    backoff_factor=1.5,
+    out_path="runs/billing.jsonl"
+)
 ```
 
 ## Determinism knobs
@@ -132,3 +190,4 @@ Before you trust a result, confirm:
 - [ ] Shared state was a copy / scratch instance; nothing real was mutated.
 - [ ] Spies were reset per run (call lists don't leak between repeats).
 - [ ] The same input was run in both temp=0 and temp>0 regimes.
+- [ ] Timeouts and rate-limit retries are enabled for long-running batches.

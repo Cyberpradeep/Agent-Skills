@@ -31,9 +31,16 @@ from __future__ import annotations
 
 import argparse
 import json
+import sys
 from collections import Counter, defaultdict
 from difflib import SequenceMatcher
 from typing import Any, Dict, List, Optional, Tuple
+
+if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
 
 def load_runs(path: str) -> List[Dict[str, Any]]:

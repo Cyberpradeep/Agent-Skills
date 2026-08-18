@@ -29,9 +29,16 @@ from __future__ import annotations
 import argparse
 import html
 import json
+import sys
 from collections import defaultdict
 from datetime import date
 from typing import Any, Dict, List, Optional
+
+if sys.stdout and hasattr(sys.stdout, "reconfigure"):
+    try:
+        sys.stdout.reconfigure(encoding="utf-8", errors="replace")
+    except Exception:
+        pass
 
 
 _SEVERITY = {"stable": 0, "drifting": 1, "non-deterministic": 2, "all-errored": 3}
