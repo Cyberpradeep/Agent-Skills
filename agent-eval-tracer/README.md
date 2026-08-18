@@ -1,4 +1,4 @@
-# 🔬 Agent Eval Tracer
+#  Agent Eval Tracer
 
 <p align="center">
   <strong>Precision isolated testing, statistical consistency analysis, and deep memory retention benchmarking for multi-agent AI architectures.</strong>
@@ -14,7 +14,7 @@
 
 ---
 
-## ⚡ The Problem: The "Masking" Dilemma
+##  The Problem: The "Masking" Dilemma
 
 > [!CAUTION]
 > **End-to-End Pass Rates Lie.**
@@ -45,7 +45,7 @@ flowchart TD
 
 ---
 
-## 💡 Why Agent Eval Tracer?
+##  Why Agent Eval Tracer?
 
 | Challenge in Agent Systems | Traditional E2E Testing | Agent Eval Tracer Approach |
 | :--- | :--- | :--- |
@@ -58,15 +58,15 @@ flowchart TD
 
 ---
 
-## 🏗️ Core Evaluation Pillars
+##  Core Evaluation Pillars
 
-### 1. 🛡️ Side-Effect Free Isolation
+### 1.  Side-Effect Free Isolation
 Test agents independently without touching live infrastructure:
 - **`ToolSpy`:** Intercepts database writes, API mutations, and external calls. Asserts on agent intent while returning canned responses.
 - **Frozen Inputs:** Eliminates upstream flakiness by providing fixed, deterministic input fixtures.
 - **Scratch Stores:** Ephemeral memory state isolation to prevent cross-test contamination.
 
-### 2. 🎲 Consistency & Hallucination Profiling
+### 2.  Consistency & Hallucination Profiling
 Hallucinations are inherently unstable. Running inputs across two distinct regimes surfaces latent fragility:
 - **Determinism Check (`temperature = 0.0`):** Any divergence is flagged as a code/configuration defect.
 - **Robustness Check (`temperature > 0.7`):** Measures decision stability across $N$ repeats, extracting core decisions rather than scoring brittle prose.
@@ -83,7 +83,7 @@ graph TD
     Analyzer --> Verdict["Verdict: DRIFTING (80% Agreement)\nMajority: billing | Outliers: Run 3"]
 ```
 
-### 3. 🧠 Planted-Fact Memory Retention Testing
+### 3.  Planted-Fact Memory Retention Testing
 Tests whether rolling summarization or compression silently drops critical facts over long horizons:
 
 ```
@@ -93,12 +93,12 @@ Tests whether rolling summarization or compression silently drops critical facts
 > [!IMPORTANT]
 > Probes are executed against the **summarized memory state**, not the raw side transcript, accurately exposing lossy compression bugs.
 
-### 4. 📊 Masking-First Actionable Reporting
+### 4.  Masking-First Actionable Reporting
 Compiles automated Markdown and standalone HTML reports that lead directly with architectural masking and clustered root causes.
 
 ---
 
-## 🚀 Quick Start
+##  Quick Start
 
 Agent Eval Tracer requires **Python 3.8+** with **zero third-party dependencies** (built purely with standard library modules: `dataclasses`, `difflib`, `argparse`, `json`).
 
@@ -127,7 +127,7 @@ python scripts/build_report.py --demo --html sample_report.html
 
 ---
 
-## 💻 Usage & Integration
+##  Usage & Integration
 
 ### Step 1: Wrap Your Agent in an Adapter
 
@@ -228,7 +228,7 @@ python scripts/build_report.py \
 
 ---
 
-## 📋 Sample Report Output
+##  Sample Report Output
 
 ```markdown
 # Agent Evaluation Report — Customer Support Agent v2
@@ -250,7 +250,7 @@ python scripts/build_report.py \
 
 ---
 
-## 📂 Repository Structure
+##  Repository Structure
 
 ```
 agent-eval-tracer/
@@ -270,7 +270,7 @@ agent-eval-tracer/
 
 ---
 
-## 🎯 Best Practices
+##  Best Practices
 
 > [!TIP]
 > **Compare Decisions, Not Prose:** When evaluating free-form agent responses, configure the analyzer to extract the underlying action, tool parameters, or routing destination rather than matching raw string tokens.
