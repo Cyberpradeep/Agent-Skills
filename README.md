@@ -1,4 +1,4 @@
-# Agent Skills
+# 🧠 Agent Skills
 
 <p align="center">
   <strong>A curated collection of production-grade, framework-agnostic skills, evaluation harnesses, and diagnostic toolkits for AI agents and multi-agent systems.</strong>
@@ -12,16 +12,16 @@
 
 ---
 
-## Introduction
+## 📖 Introduction
 
 As agentic AI architectures evolve into complex multi-agent systems, evaluating and extending them requires modular, reliable, and standardized tools. 
 
-This repository serves as a centralized collection of **agent skills** designed to diagnose regressions, test sub-agent consistency in isolation, verify long-term memory retention, and extend AI agent capabilities with zero external dependencies.
+This repository serves as a centralized collection of **agent skills** designed to diagnose regressions, test sub-agent consistency in isolation, verify long-term memory retention, and extend AI agent[...]
 
 ---
 
-## Skills Catalog
+## 🗂️ Skills Catalog
 
 | Skill | Category | Description | Status |
 | :--- | :--- | :--- | :---: |
-| [**`agent-eval-tracer`**](./agent-eval-tracer/) | **Evaluation & Observability** | Isolated unit testing, statistical consistency analysis, planted-fact memory recall, and masking detection for multi-agent systems. | `Production Ready` |
+| [**`agent-eval-tracer`**](./agent-eval-tracer/) | **Evaluation & Observability** | Isolated unit testing, statistical consistency analysis, planted-fact memory recall, and masking detection for multi-agent systems. |  |
