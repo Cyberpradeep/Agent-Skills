@@ -1,4 +1,4 @@
-# 🧠 Agent Skills
+# Agent Skills
 
 <p align="center">
   <strong>A curated collection of production-grade, framework-agnostic skills, evaluation harnesses, and diagnostic toolkits for AI agents and multi-agent systems.</strong>
@@ -12,7 +12,7 @@
 
 ---
 
-## 📖 Introduction
+## Introduction
 
 As agentic AI architectures evolve into complex multi-agent systems, evaluating and extending them requires modular, reliable, and standardized tools. 
 
@@ -20,7 +20,7 @@ This repository serves as a centralized collection of **agent skills** designed 
 
 ---
 
-## 🗂️ Skills Catalog
+## Skills Catalog
 
 | Skill | Category | Description | Status |
 | :--- | :--- | :--- | :---: |
