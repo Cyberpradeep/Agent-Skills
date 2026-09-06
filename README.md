@@ -16,7 +16,7 @@
 
 As agentic AI architectures evolve into complex multi-agent systems, evaluating and extending them requires modular, reliable, and standardized tools. 
 
-This repository serves as a centralized collection of **agent skills** designed to diagnose regressions, test sub-agent consistency in isolation, verify long-term memory retention, and extend AI agent[...]
+This repository serves as a centralized collection of **agent skills** designed to diagnose regressions, test sub-agent consistency in isolation, verify long-term memory retention, and extend AI agents with well-defined integration contracts.
 
 ---
 
@@ -24,4 +24,5 @@ This repository serves as a centralized collection of **agent skills** designed 
 
 | Skill | Category | Description |  
 | :--- | :--- | :--- |
-| [**`agent-eval-tracer`**](./agent-eval-tracer/) | **Evaluation & Observability** | Isolated unit testing, statistical consistency analysis, planted-fact memory recall, and masking detection for multi-agent systems. |  
+| [**`agent-eval-tracer`**](./agent-eval-tracer/) | **Evaluation & Observability** | Isolated unit testing, statistical consistency analysis, planted-fact memory recall, and masking detection for agent pipelines. |
+| [**`isolate-verify-integrate`**](./isolate-verify-integrate/) | **Integration & Protocols** | Adapter patterns, contract tests, and CI-ready harnesses for isolating, verifying, and safely integrating agents into production pipelines. |
